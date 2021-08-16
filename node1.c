@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "helper.h"
 
 extern struct rtpkt {
   int sourceid;       /* id of sending router sending this pkt */
@@ -19,23 +20,47 @@ struct distance_table
   int costs[4][4];
 } dt1;
 
+struct vector_table vt1;
 
 /* students to write the following two routines, and maybe some others */
 
-
 void rtinit1() 
 {
+  // initialize all entries to 999
+  for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int j = 0; j < 4; j++) {
+      vt1.costs[i][j] = 999;
+    }
+  }
+  // copy node1's dv to the table
+  copy_vector(vt1.costs[1], connectcosts1, 4);
 
+  // send to direct neighbors
+  struct rtpkt pkt;
+  pkt.sourceid = 1;
+  for (unsigned int i = 0; i < 4; i++) {
+    pkt.mincost[i] = vt1.costs[1][i];
+  }
+
+  // send to each neighbor
+  for (unsigned int i = 0; i < 4; i++) {
+    if (vt1.costs[1][i] != 0 || vt1.costs[1][i] != 999) {
+      pkt.destid = i;
+      tolayer2(pkt);
+    }
+  }
+
+  printf("NODE1 VECTOR TABLE:\n");
+  printvt(&vt1);
+  printf("-------------------\n");
 }
 
 
 void rtupdate1(rcvdpkt)
   struct rtpkt *rcvdpkt;
-  
 {
 
 }
-
 
 printdt1(dtptr)
   struct distance_table *dtptr;
@@ -49,8 +74,6 @@ printdt1(dtptr)
   printf("     3|  %3d   %3d\n",dtptr->costs[3][0], dtptr->costs[3][2]);
 
 }
-
-
 
 linkhandler1(linkid, newcost)   
 int linkid, newcost;   

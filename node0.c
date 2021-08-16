@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "helper.h"
 
 extern struct rtpkt {
   int sourceid;       /* id of sending router sending this pkt */
@@ -16,11 +17,8 @@ struct distance_table
   int costs[4][4];
 } dt0;
 
-struct vector_table
-{
-  int costs[4][4];
-} vt0;
-
+// instantiate a new vector table for node0
+struct vector_table vt0;
 
 /* students to write the following two routines, and maybe some others */
 
@@ -52,7 +50,9 @@ void rtinit0()
     tolayer2(pkt);
   }
 
-  printvt0(&vt0);
+  printf("NODE0 VECTOR TABLE:\n");
+  printvt(&vt0);
+  printf("-------------------\n");
 }
 
 // called when a routing pkt is received from a neighbor
@@ -87,38 +87,22 @@ void rtupdate0(rcvdpkt)
   // if node0 dv changed, send updated vector to all neighbors
   // old_vec = straight from vt0 table
   // new_vec = the copy that was updated
-  int equal = compare_vectors(&node0_dv_copy, &vt0.costs[0]);
+  int equal = compare_vectors(node0_dv_copy, vt0.costs[0], 4);
   if (equal) {
     tolayer2(node0_dv_copy);
-    copy_vector(vt0.costs[0], node0_dv_copy);
+    copy_vector(vt0.costs[0], node0_dv_copy, 4);
   }
 
-  printvt0(&vt0);
+  printf("NODE0 VECTOR TABLE (AFTER UPDATE):\n");
+  printvt(&vt0);
+  printf("---------------------\n");
 }
 
 /**
  * TODO
- * write methods for n1 to test between those 2 nodes
- * mainly want to test the updating function
+ * figure out bug in rtupdate0() method - not updating distances correctly
  * figure out what dt (supplied) is used for
  */
-
-// HELPER METHODS
-int compare_vectors(const int* v1, const int* v2) {
-  for (unsigned int i = 0; i < 4; i++) {
-    if (v1[i] != v2[i]) {
-      return 0;
-    }
-  }
-  return 1;
-}
-
-// copy v2 to v1
-void copy_vector(int* v1, const int* v2) {
-  for (unsigned int i = 0; i < 4; i++) {
-    v1[i] = v2[i];
-  }
-}
 
 void printdt0(dtptr)
   struct distance_table *dtptr;
@@ -132,21 +116,6 @@ void printdt0(dtptr)
 	 dtptr->costs[2][2],dtptr->costs[2][3]);
   printf("     3|  %3d   %3d   %3d\n",dtptr->costs[3][1],
 	 dtptr->costs[3][2],dtptr->costs[3][3]);
-}
-
-void printvt0(vtptr)
-  struct vector_table *vtptr;
-{
-  printf("   D0 |    0     1     2     3 \n");
-  printf("  ----|------------------------\n");
-  printf("     0|  %3d   %3d   %3d   %3d\n",vtptr->costs[0][0],
-	 vtptr->costs[0][1],vtptr->costs[0][2],vtptr->costs[0][3]);
-  printf("     1|  %3d   %3d   %3d   %3d\n",vtptr->costs[1][0],
-	 vtptr->costs[1][1],vtptr->costs[1][2],vtptr->costs[1][3]);
-  printf("     2|  %3d   %3d   %3d   %3d\n",vtptr->costs[2][0],
-	 vtptr->costs[2][1],vtptr->costs[2][2],vtptr->costs[2][3]);
-  printf("     3|  %3d   %3d   %3d   %3d\n",vtptr->costs[3][0],
-	 vtptr->costs[3][1],vtptr->costs[3][2],vtptr->costs[3][3]);
 }
 
 linkhandler0(linkid, newcost)   
