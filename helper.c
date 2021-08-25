@@ -30,3 +30,15 @@ int compare_vectors(const int* v1, const int* v2, unsigned int length) {
   }
   return 1;
 }
+
+void print_vector(const int* vector) {
+  for (unsigned int i = 0; i < 4; i++) {
+    printf("%d ", vector[i]);
+  }
+}
+
+// void send_rtpkt(unsigned int source_id, const struct vector_table vt) {
+//   struct rtpkt pkt;
+//   pkt.sourceid = source_id;
+//   copy_vector(pkt.mincost, vt.costs[source_id], 4);
+// }

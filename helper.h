@@ -11,3 +11,6 @@ extern void copy_vector();
 
 // compares vectors
 extern int compare_vectors();
+
+// prints a vector
+extern void print_vector();

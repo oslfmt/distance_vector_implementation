@@ -63,7 +63,7 @@ void rtupdate0(rcvdpkt)
   // routing packet received from neighbor
   // copy vector to appropriate entry based on neighbor rcvd from
   int neighbor = rcvdpkt->sourceid;
-  for (unsigned int i = 0; i < sizeof(rcvdpkt->mincost); i++) {
+  for (unsigned int i = 0; i < 4; i++) {
     vt0.costs[neighbor][i] = rcvdpkt->mincost[i];
   }
 
@@ -79,28 +79,38 @@ void rtupdate0(rcvdpkt)
     for (unsigned int neighbor = 0; neighbor < 4; neighbor++) {
       int new_cost = node0_dv_copy[neighbor] + vt0.costs[neighbor][dest];
       if (new_cost < min_to_dest) {
+        // this only changes the copy
         node0_dv_copy[dest] = new_cost;
       }
     }
   }
 
   // if node0 dv changed, send updated vector to all neighbors
-  // old_vec = straight from vt0 table
-  // new_vec = the copy that was updated
   int equal = compare_vectors(node0_dv_copy, vt0.costs[0], 4);
-  if (equal) {
-    tolayer2(node0_dv_copy);
+  if (equal == 0) {
+    // update node0 vector table
     copy_vector(vt0.costs[0], node0_dv_copy, 4);
+
+    // send updated dv to all neighbors
+    struct rtpkt pkt;
+    pkt.sourceid = 0;
+    copy_vector(pkt.mincost, vt0.costs[0], 4);
+    
+    // send to each neighbor
+    for (unsigned int i = 1; i < 4; i++) {
+      pkt.destid = i;
+      tolayer2(pkt);
+    }
   }
 
-  printf("NODE0 VECTOR TABLE (AFTER UPDATE):\n");
+  printf("NODE1 VECTOR TABLE (AFTER UPDATE):\n");
   printvt(&vt0);
   printf("---------------------\n");
 }
 
 /**
  * TODO
- * figure out bug in rtupdate0() method - not updating distances correctly
+ * figure out why dv has huge negative numbers...walkthrough the entire update computation for node0
  * figure out what dt (supplied) is used for
  */
 
