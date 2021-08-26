@@ -103,7 +103,7 @@ void rtupdate0(rcvdpkt)
     }
   }
 
-  printf("NODE1 VECTOR TABLE (AFTER UPDATE):\n");
+  printf("NODE0 VECTOR TABLE (AFTER UPDATE):\n");
   printvt(&vt0);
   printf("---------------------\n");
 }

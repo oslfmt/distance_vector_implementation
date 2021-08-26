@@ -42,7 +42,6 @@ void rtinit1()
     pkt.mincost[i] = vt1.costs[1][i];
   }
 
-  // send to each neighbor
   for (unsigned int i = 0; i < 4; i++) {
     if (i == 0 || i == 2) {
       pkt.destid = i;
@@ -65,7 +64,7 @@ void rtupdate1(rcvdpkt)
     vt1.costs[neighbor][i] = rcvdpkt->mincost[i];
   }
 
-  // copy node1 distance vector to a temporary vector
+  // copy node distance vector to a temporary vector
   int node1_dv_copy[4];
   for (unsigned int dest = 0; dest < 4; dest++) {
     node1_dv_copy[dest] = vt1.costs[1][dest];
@@ -76,7 +75,6 @@ void rtupdate1(rcvdpkt)
     for (unsigned int neighbor = 0; neighbor < 4; neighbor++) {
       int new_cost = node1_dv_copy[neighbor] + vt1.costs[neighbor][dest];
       if (new_cost < min_to_dest) {
-        // this only changes the copy
         node1_dv_copy[dest] = new_cost;
       }
     }
@@ -92,12 +90,6 @@ void rtupdate1(rcvdpkt)
     struct rtpkt pkt;
     pkt.sourceid = 1;
     copy_vector(pkt.mincost, vt1.costs[1], 4);
-    
-    // send to each neighbor
-    for (unsigned int i = 1; i < 4; i++) {
-      pkt.destid = i;
-      tolayer2(pkt);
-    }
 
     // send to each neighbor
     for (unsigned int i = 0; i < 4; i++) {

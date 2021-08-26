@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "helper.h"
 
 extern struct rtpkt {
   int sourceid;       /* id of sending router sending this pkt */
@@ -16,19 +17,84 @@ struct distance_table
   int costs[4][4];
 } dt2;
 
+int connectcosts2[4] = { 3, 1, 0, 2 };
+struct vector_table vt2;
 
 /* students to write the following two routines, and maybe some others */
 
 void rtinit2() 
 {
+  // initialize vector table
+  for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int j = 0; j < 4; j++) {
+      vt2.costs[i][j] = 999;
+    }
+  }
+  copy_vector(vt2.costs[2], connectcosts2, 4);
+
+  // send to direct neighbors
+  struct rtpkt pkt;
+  pkt.sourceid = 2;
+  for (unsigned int i = 0; i < 4; i++) {
+    pkt.mincost[i] = vt2.costs[2][i];
+  }
+  
+  for (unsigned int i = 0; i < 4; i++) {
+    if (i != 2) {
+      pkt.destid = i;
+      tolayer2(pkt);
+    } 
+  }
+
+  printf("NODE2 VECTOR TABLE:\n");
+  printvt(&vt2);
+  printf("-------------------\n");
 }
 
 
 void rtupdate2(rcvdpkt)
   struct rtpkt *rcvdpkt;
-  
 {
+  // copy vector to appropriate entry based on neighbor rcvd from
+  int neighbor = rcvdpkt->sourceid;
+  for (unsigned int i = 0; i < 4; i++) {
+    vt2.costs[neighbor][i] = rcvdpkt->mincost[i];
+  }
 
+  // copy node dv to a temporary vector
+  int node2_dv_copy[4];
+  for (unsigned int dest = 0; dest < 4; dest++) {
+    node2_dv_copy[dest] = vt2.costs[2][dest];
+  }
+
+  for (unsigned int dest = 0; dest < 4; dest++) {
+    int min_to_dest = node2_dv_copy[dest];
+    for (unsigned int neighbor = 0; neighbor < 4; neighbor++) {
+      int new_cost = node2_dv_copy[neighbor] + vt2.costs[neighbor][dest];
+      if (new_cost < min_to_dest) {
+        node2_dv_copy[dest] = new_cost;
+      }
+    }
+  }
+
+  int equal = compare_vectors(node2_dv_copy, vt2.costs[2], 4);
+  if (equal == 0) {
+    // update vector table
+    copy_vector(vt2.costs[2], node2_dv_copy, 4);
+
+    // send updated dv to all neighbors
+    struct rtpkt pkt;
+    pkt.sourceid = 2;
+    copy_vector(pkt.mincost, vt2.costs[2], 4);
+
+    // send to each neighbor
+    for (unsigned int i = 0; i < 4; i++) {
+      if (i != 2) {
+        pkt.destid = i;
+        tolayer2(pkt);
+      } 
+    }
+  }
 }
 
 
