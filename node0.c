@@ -37,6 +37,12 @@ void rtinit0()
     }
   }
 
+  // set next hops
+  vt0.next_hops[0] = 0;
+  vt0.next_hops[1] = 1;
+  vt0.next_hops[2] = 2;
+  vt0.next_hops[3] = 3;
+
   // send to direct neighbors, node's distance vector by calling tolayer2() and passing in a routing packet (rtpkt)
   struct rtpkt pkt;
   pkt.sourceid = 0;
@@ -73,6 +79,7 @@ void rtupdate0(rcvdpkt)
     node0_dv_copy[dest] = vt0.costs[0][dest];
   }
 
+  // equal = 1
   // update node 0's distance vector (copy) using new vector
   for (unsigned int dest = 0; dest < 4; dest++) {
     int min_to_dest = node0_dv_copy[dest];
@@ -80,7 +87,10 @@ void rtupdate0(rcvdpkt)
       int new_cost = node0_dv_copy[neighbor] + vt0.costs[neighbor][dest];
       if (new_cost < min_to_dest) {
         // this only changes the copy
+        // equal = 0
         node0_dv_copy[dest] = new_cost;
+        // update next hop
+        vt0.next_hops[dest] = neighbor;
       }
     }
   }
@@ -107,12 +117,6 @@ void rtupdate0(rcvdpkt)
   printvt(&vt0);
   printf("---------------------\n");
 }
-
-/**
- * TODO
- * figure out why dv has huge negative numbers...walkthrough the entire update computation for node0
- * figure out what dt (supplied) is used for
- */
 
 void printdt0(dtptr)
   struct distance_table *dtptr;

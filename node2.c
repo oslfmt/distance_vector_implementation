@@ -95,6 +95,10 @@ void rtupdate2(rcvdpkt)
       } 
     }
   }
+
+  printf("NODE2 VECTOR TABLE (AFTER UPDATE):\n");
+  printvt(&vt2);
+  printf("---------------------\n");
 }
 
 

@@ -91,6 +91,10 @@ void rtupdate3(rcvdpkt)
       tolayer2(pkt);
     }
   }
+
+  printf("NODE3 VECTOR TABLE (AFTER UPDATE):\n");
+  printvt(&vt3);
+  printf("---------------------\n");
 }
 
 

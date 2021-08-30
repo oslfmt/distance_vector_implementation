@@ -1,6 +1,7 @@
 struct vector_table
 {
   int costs[4][4];
+  int next_hops[4];
 };
 
 // prints full vector table
