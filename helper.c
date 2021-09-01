@@ -14,6 +14,11 @@ void printvt(vtptr)
 	 vtptr->costs[2][1],vtptr->costs[2][2],vtptr->costs[2][3]);
   printf("     3|  %3d   %3d   %3d   %3d\n",vtptr->costs[3][0],
 	 vtptr->costs[3][1],vtptr->costs[3][2],vtptr->costs[3][3]);
+
+  printf("NEXT HOPS\n");
+  for (unsigned int i = 0; i < 4; i++) {
+    printf("%d ", vtptr->next_hops[i]);
+  }
 }
 
 void copy_vector(int* v1, const int* v2, unsigned int length) {

@@ -35,6 +35,11 @@ void rtinit1()
   // copy node1's dv to the table
   copy_vector(vt1.costs[1], connectcosts1, 4);
 
+  vt1.next_hops[0] = 0;
+  vt1.next_hops[1] = 999;
+  vt1.next_hops[2] = 2;
+  vt1.next_hops[3] = 999;
+
   // send to direct neighbors
   struct rtpkt pkt;
   pkt.sourceid = 1;
@@ -76,6 +81,7 @@ void rtupdate1(rcvdpkt)
       int new_cost = node1_dv_copy[neighbor] + vt1.costs[neighbor][dest];
       if (new_cost < min_to_dest) {
         node1_dv_copy[dest] = new_cost;
+        vt1.next_hops[dest] = vt1.next_hops[neighbor];;
       }
     }
   }

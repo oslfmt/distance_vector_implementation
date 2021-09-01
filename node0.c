@@ -38,7 +38,7 @@ void rtinit0()
   }
 
   // set next hops
-  vt0.next_hops[0] = 0;
+  vt0.next_hops[0] = 999;
   vt0.next_hops[1] = 1;
   vt0.next_hops[2] = 2;
   vt0.next_hops[3] = 3;
@@ -89,8 +89,8 @@ void rtupdate0(rcvdpkt)
         // this only changes the copy
         // equal = 0
         node0_dv_copy[dest] = new_cost;
-        // update next hop
-        vt0.next_hops[dest] = neighbor;
+        // update next hop - it is the hop to get to the neighbor (which leads to shortest path to ultimate dest)
+        vt0.next_hops[dest] = vt0.next_hops[neighbor];
       }
     }
   }
